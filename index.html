@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Be My Valentine?</title>
+
+  <style>
+    :root{
+      --bg1:#ffedf3;
+      --bg2:#fff7fb;
+      --ink:#222;
+      --pink:#ff4d88;
+      --pink2:#ff87b2;
+      --card:#ffffffcc;
+      --shadow: 0 20px 60px rgba(0,0,0,.12);
+      --radius: 22px;
+      --btnRadius: 999px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 800px at 20% 20%, var(--bg2), transparent 60%),
+        radial-gradient(1200px 800px at 80% 80%, var(--bg1), transparent 60%),
+        linear-gradient(135deg, #fff, #ffe6f0);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+    }
+
+    .card{
+      width:min(720px, 92vw);
+      background:var(--card);
+      border:1px solid rgba(255,77,136,.18);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 34px 28px;
+      text-align:center;
+      backdrop-filter: blur(10px);
+      position:relative;
+    }
+
+    h1{ margin:0 0 8px; font-size: clamp(28px, 4vw, 44px); }
+    p{ margin: 0 0 22px; font-size: clamp(14px, 2vw, 18px); opacity:.9; }
+
+    .btnRow{
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      align-items:center;
+      margin-top: 10px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      border:0;
+      padding: 14px 20px;
+      border-radius: var(--btnRadius);
+      font-weight: 800;
+      cursor:pointer;
+      font-size: 16px;
+      user-select:none;
+    }
+
+    /* YES: no hover transforms at all (prevents rect shifting) */
+    #yesBtn{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#fff;
+    }
+
+    #noBtn{
+      background:#fff;
+      color: var(--pink);
+      border: 2px solid rgba(255,77,136,.35);
+    }
+
+    .status{
+      margin-top: 18px;
+      font-weight: 800;
+      color: rgba(34,34,34,.75);
+      min-height: 26px;
+    }
+
+    /* tired appears only after 10s */
+    #tiredWrap{
+      display:none;
+      justify-content:center;
+      margin-top: 14px;
+    }
+    #tiredBtn{
+      background:#111;
+      color:#fff;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-weight: 900;
+    }
+
+    /* Modal */
+    .modalBackdrop{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.38);
+      display:none;
+      place-items:center;
+      z-index: 9999;
+      padding: 16px;
+    }
+    .modal{
+      width:min(520px, 92vw);
+      background:#fff;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 18px 16px;
+      border: 1px solid rgba(0,0,0,.06);
+      text-align:left;
+    }
+    .modal h2{ margin: 0 0 6px; font-size: 20px; color: var(--pink); }
+    .modal p{ margin: 0 0 12px; }
+    .modalActions{ display:flex; justify-content:flex-end; gap:10px; }
+    .smallBtn{
+      padding: 10px 14px;
+      font-size: 14px;
+      border-radius: 12px;
+      border:0;
+      cursor:pointer;
+      font-weight: 800;
+    }
+    .ok{ background: linear-gradient(135deg, var(--pink), var(--pink2)); color:#fff; }
+    .close{ background:#f3f3f3; }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <h1>Will you be my Valentine? 💘</h1>
+    <p>Choose wisely… (I’m watching 👀)</p>
+
+    <div class="btnRow" id="btnRow">
+      <button id="yesBtn" aria-label="Yes">Yes 💖</button>
+      <button id="noBtn" aria-label="No">No 🙃</button>
+    </div>
+
+    <div id="tiredWrap">
+      <button id="tiredBtn">Stop it !!! 😠, I’m tired now 😮‍💨</button>
+    </div>
+
+    <div class="status" id="status"></div>
+  </main>
+
+  <!-- Modal -->
+  <div class="modalBackdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2>Ineligible Option 🚫</h2>
+      <p>My boss said that it's an ineligible option. You are my valentine only. 😤💖</p>
+      <div class="modalActions">
+        <button class="smallBtn close" id="closeModal">Close</button>
+        <button class="smallBtn ok" id="okModal">Okay 😌</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const btnRow = document.getElementById('btnRow');
+
+    const tiredWrap = document.getElementById('tiredWrap');
+    const tiredBtn = document.getElementById('tiredBtn');
+    const statusEl = document.getElementById('status');
+
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const closeModal = document.getElementById('closeModal');
+    const okModal = document.getElementById('okModal');
+
+    // --- state flags ---
+    let chaseStarted = false;
+    let frozen = false;     // once tired is clicked, YES stops moving
+    let yesClickable = false;
+
+    // --- NO modal ---
+    function openModal(){ modalBackdrop.style.display = 'grid'; }
+    function hideModal(){ modalBackdrop.style.display = 'none'; }
+    noBtn.addEventListener('click', openModal);
+    closeModal.addEventListener('click', hideModal);
+    okModal.addEventListener('click', hideModal);
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) hideModal();
+    });
+
+    // --- mouse tracking ---
+    let mouseX = 0, mouseY = 0;
+    let prevX = 0, prevY = 0, prevT = performance.now();
+    let cursorSpeed = 0;
+    let mouseReady = false;
+
+    window.addEventListener('mousemove', (e) => {
+      const now = performance.now();
+      const dt = (now - prevT) / 1000;
+
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      if (!mouseReady) {
+        mouseReady = true;
+        prevX = mouseX; prevY = mouseY; prevT = now;
+        cursorSpeed = 0;
+        return;
+      }
+
+      if (dt > 0) {
+        const dx = mouseX - prevX;
+        const dy = mouseY - prevY;
+        cursorSpeed = Math.hypot(dx, dy) / dt;
+      }
+
+      prevX = mouseX; prevY = mouseY; prevT = now;
+    });
+
+    // --- tired appears after 10s from chase start ---
+    let timerStarted = false;
+    function startTimerOnce(){
+      if (timerStarted) return;
+      timerStarted = true;
+
+      statusEl.textContent = "Say Yes to me pleaseee... 😢";
+      setTimeout(() => {
+        tiredWrap.style.display = 'flex';
+        statusEl.textContent = "click 👆🏻";
+      }, 10000);
+    }
+
+    // --- When tired clicked: freeze YES and make it clickable ---
+    tiredBtn.addEventListener('click', () => {
+      frozen = true;
+      yesClickable = true;
+
+      // Hide tired button after using it (optional, feels clean)
+      tiredWrap.style.display = 'none';
+
+      statusEl.textContent = "Alright !! Alright !! Nahi heran krto bas😌 Now click YES 💖";
+    });
+
+    // --- YES click behavior ---
+    yesBtn.addEventListener('click', (e) => {
+      if (!yesClickable) {
+        // before tired, prevent click
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      // after tired: go to gifts page
+      window.location.href = 'wheel.html';
+    });
+
+    // ===== Runaway engine (same working logic) =====
+    const TRIGGER_RADIUS = 160;
+    const PAD = 12;
+
+    const MIN_STEP = 5;
+    const BASE_SPEED = 260;
+    const SPEED_FACTOR = 0.7;
+    const MAX_SPEED = 900;
+
+    // Button position in viewport coords (top-left)
+    let bx = 0, by = 0;
+
+    // Placeholder so row doesn't jump when we detach Yes
+    let placeholder = null;
+
+    function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+    function getBoundsForButton(btn){
+      const r = btn.getBoundingClientRect();
+      const w = r.width;
+      const h = r.height;
+      return {
+        w, h,
+        minX: PAD,
+        minY: PAD,
+        maxX: Math.max(PAD, window.innerWidth  - w - PAD),
+        maxY: Math.max(PAD, window.innerHeight - h - PAD),
+      };
+    }
+
+    function setFixedPos(x, y){
+      yesBtn.style.left = x + "px";
+      yesBtn.style.top  = y + "px";
+    }
+
+    function beginChase(){
+      if (chaseStarted) return;
+      chaseStarted = true;
+
+      // Measure current position in layout
+      const rect = yesBtn.getBoundingClientRect();
+      bx = rect.left;
+      by = rect.top;
+
+      // Create placeholder to keep layout stable
+      placeholder = document.createElement('span');
+      placeholder.style.display = 'inline-block';
+      placeholder.style.width = rect.width + 'px';
+      placeholder.style.height = rect.height + 'px';
+      placeholder.style.pointerEvents = 'none';
+
+      // Put placeholder where YES was
+      btnRow.insertBefore(placeholder, yesBtn);
+
+      // Detach YES to body (prevents flex/center reflow pop)
+      document.body.appendChild(yesBtn);
+
+      // Make fixed at same pixels
+      yesBtn.style.position = 'fixed';
+      yesBtn.style.margin = '0';
+      yesBtn.style.zIndex = '999';
+      yesBtn.style.willChange = 'left, top';
+
+      // Clamp immediately
+      const b = getBoundsForButton(yesBtn);
+      bx = clamp(bx, b.minX, b.maxX);
+      by = clamp(by, b.minY, b.maxY);
+      setFixedPos(bx, by);
+
+      startTimerOnce();
+    }
+
+    let last = performance.now();
+    function tick(now){
+      requestAnimationFrame(tick);
+      if (!mouseReady) return;
+      if (frozen) return; // STOP moving forever once tired is clicked
+
+      let dt = (now - last) / 1000;
+      dt = Math.min(dt, 0.016);
+      last = now;
+
+      const r = yesBtn.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top  + r.height / 2;
+
+      const dx = cx - mouseX;
+      const dy = cy - mouseY;
+      const dist = Math.hypot(dx, dy);
+
+      if (!chaseStarted && dist < TRIGGER_RADIUS) {
+        beginChase();
+      }
+
+      if (!chaseStarted) return;
+
+      const b = getBoundsForButton(yesBtn);
+      const active = dist < (TRIGGER_RADIUS + 60);
+
+      if (active) {
+        const ux = dx / (dist || 1);
+        const uy = dy / (dist || 1);
+
+        const speed = Math.min(
+          MAX_SPEED,
+          Math.max(BASE_SPEED, BASE_SPEED + cursorSpeed * SPEED_FACTOR)
+        );
+
+        let step = speed * dt;
+        if (step < MIN_STEP) step = MIN_STEP;
+
+        let nx = bx + ux * step;
+        let ny = by + uy * step;
+
+        // Edge steering so it doesn't dead-end
+        const nearLeft   = (bx - b.minX) < 14;
+        const nearRight  = (b.maxX - bx) < 14;
+        const nearTop    = (by - b.minY) < 14;
+        const nearBottom = (b.maxY - by) < 14;
+
+        if (nearLeft)   nx += 40 * dt;
+        if (nearRight)  nx -= 40 * dt;
+        if (nearTop)    ny += 40 * dt;
+        if (nearBottom) ny -= 40 * dt;
+
+        if ((nearLeft || nearRight) && (nearTop || nearBottom)) {
+          const px = -uy;
+          const py =  ux;
+          nx += px * 120 * dt;
+          ny += py * 120 * dt;
+        }
+
+        bx = clamp(nx, b.minX, b.maxX);
+        by = clamp(ny, b.minY, b.maxY);
+        setFixedPos(bx, by);
+      } else {
+        // Safety clamp
+        bx = clamp(bx, b.minX, b.maxX);
+        by = clamp(by, b.minY, b.maxY);
+        setFixedPos(bx, by);
+      }
+    }
+
+    requestAnimationFrame(tick);
+
+    window.addEventListener('resize', () => {
+      if (!chaseStarted) return;
+      const b = getBoundsForButton(yesBtn);
+      bx = clamp(bx, b.minX, b.maxX);
+      by = clamp(by, b.minY, b.maxY);
+      setFixedPos(bx, by);
+    });
+  </script>
+</body>
+</html>

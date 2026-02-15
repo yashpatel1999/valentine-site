@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spin the Wheel 🎡</title>
+  <style>
+    :root{
+      --bg1:#ffedf3;
+      --bg2:#fff7fb;
+      --ink:#222;
+      --pink:#ff4d88;
+      --pink2:#ff87b2;
+      --card:#ffffffcc;
+      --shadow: 0 20px 60px rgba(0,0,0,.12);
+      --radius: 22px;
+      --btnRadius: 999px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 800px at 20% 20%, var(--bg2), transparent 60%),
+        radial-gradient(1200px 800px at 80% 80%, var(--bg1), transparent 60%),
+        linear-gradient(135deg, #fff, #ffe6f0);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      padding: 16px;
+    }
+
+    .layout{
+      width:min(1100px, 96vw);
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 900px){
+      .layout{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid rgba(255,77,136,.18);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 22px 18px;
+      backdrop-filter: blur(10px);
+    }
+
+    h1{ margin:0; font-size: clamp(22px, 3.2vw, 34px); }
+    .sub{ margin:6px 0 0; opacity:.85; font-weight: 700; }
+
+    .stage{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-items:center;
+      justify-items:center;
+      margin-top: 10px;
+    }
+    .wheelArea{
+      position:relative;
+      width:min(440px, 86vw);
+      aspect-ratio:1 / 1;
+      display:grid;
+      place-items:center;
+    }
+    canvas{
+      width:100%;
+      height:100%;
+      border-radius: 50%;
+      display:block;
+      box-shadow: 0 18px 50px rgba(0,0,0,.12);
+      background: rgba(255,255,255,.8);
+    }
+    .pin{
+  position:absolute;
+  top:-10px;             /* sits just outside the wheel */
+  left:50%;
+  transform: translateX(-50%);
+  width:0; height:0;
+
+  border-left:14px solid transparent;
+  border-right:14px solid transparent;
+  border-top:26px solid #111;     /* triangle points DOWN into the wheel */
+  border-bottom:0;
+
+  filter: drop-shadow(0 8px 10px rgba(0,0,0,.18));
+}
+
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin-top: 6px;
+    }
+    button{
+      border:0;
+      padding: 14px 18px;
+      border-radius: var(--btnRadius);
+      font-weight: 900;
+      cursor:pointer;
+      font-size: 15px;
+      user-select:none;
+    }
+    .spinBtn{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#fff;
+      min-width: 170px;
+    }
+    .secondary{ background:#111; color:#fff; }
+    .disabled{ opacity:.55; cursor:not-allowed; }
+
+    .msg{
+      text-align:center;
+      font-weight: 900;
+      min-height: 28px;
+      margin-top: 4px;
+      color: rgba(34,34,34,.75);
+    }
+
+    .winsTitle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,77,136,.10);
+      border: 1px solid rgba(255,77,136,.22);
+      font-weight: 900;
+    }
+    .winsList{
+      margin-top: 12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      max-height: 520px;
+      overflow:auto;
+      padding-right: 4px;
+    }
+    .winItem{
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 16px;
+      padding: 12px 12px;
+      font-weight: 900;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .winTag{
+      font-size: 12px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.06);
+      opacity:.8;
+      white-space:nowrap;
+    }
+
+    /* Surprise modal */
+    .modalOverlay{
+      display:none;
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.45);
+      z-index: 9999;
+      place-items:center;
+      padding: 16px;
+    }
+    .modal{
+      width:min(880px, 96vw);
+      background:#fff;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.08);
+      overflow:hidden;
+    }
+    .modalHeader{
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      background: linear-gradient(135deg, rgba(255,77,136,.12), rgba(255,135,178,.10));
+    }
+    .modalHeader h2{
+      margin:0;
+      font-size: 18px;
+      font-weight: 1000;
+    }
+    .modalBody{ padding: 14px 16px 16px; }
+
+    .modalRow{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 10px;
+    }
+    .modalHint{ font-weight: 900; opacity:.85; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .box{
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 18px;
+      padding: 16px 12px;
+      min-height: 86px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+      transform: translateZ(0);
+    }
+    .box::before{ content:"🎁"; font-size: 30px; }
+    .box.taken{ opacity:.35; filter: grayscale(1); }
+    .box.flash{
+      outline: 4px solid rgba(255,77,136,.40);
+      box-shadow: 0 0 0 8px rgba(255,77,136,.14);
+      animation: pulse .18s ease-in-out;
+    }
+    @keyframes pulse{
+      0%{ transform: scale(1); }
+      50%{ transform: scale(1.03); }
+      100%{ transform: scale(1); }
+    }
+    .fadeOut{ animation: fadeOut .35s ease forwards; }
+    @keyframes fadeOut{ to{ opacity:0; transform: scale(.98); } }
+
+    .modalActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      margin-top: 12px;
+    }
+
+    /* Reveal stage */
+    .revealStage{
+      display:none;
+      margin-top: 10px;
+      padding: 14px 12px;
+      border-radius: 18px;
+      background: radial-gradient(700px 260px at 50% 30%, rgba(255,77,136,.12), transparent 60%),
+                  #fff;
+      border: 1px solid rgba(0,0,0,.06);
+      text-align:center;
+    }
+
+    .revealMedia{
+  width:min(520px, 94vw);
+  height: 300px;                 /* fixed viewing window (change if you want) */
+  margin: 0 auto 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,.10);
+  overflow:hidden;
+  box-shadow: 0 14px 34px rgba(0,0,0,.10);
+  background: #fafafa;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.revealMedia img{
+  width:100%;
+  height:100%;
+  object-fit: contain;             /* fills the box nicely (no distortion) */
+  object-position: center;
+  display:block;
+}
+
+    .shimmer{
+      position:absolute;
+      inset:0;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.55) 45%,
+        rgba(255,255,255,0) 90%);
+      transform: translateX(-120%);
+      animation: shimmer 1.05s ease-in-out infinite;
+      mix-blend-mode: screen;
+      pointer-events:none;
+      opacity:.9;
+    }
+    @keyframes shimmer{
+      0%{ transform: translateX(-120%); }
+      100%{ transform: translateX(120%); }
+    }
+
+    .revealTitle{
+      font-size: 22px;
+      font-weight: 1100;
+      margin: 6px 0 2px;
+    }
+    .revealDesc{
+      opacity:.85;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    /* End */
+    .endOverlay{
+      display:none;
+      position: fixed;
+      inset:0;
+      background: rgba(0,0,0,.45);
+      z-index: 9998;
+      place-items:center;
+      padding: 16px;
+    }
+    .ending{
+      width:min(720px, 96vw);
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px 18px;
+      text-align:center;
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    .ending h3{
+      margin: 6px 0 6px;
+      font-size: clamp(24px, 3.2vw, 38px);
+      color: var(--pink);
+    }
+    .ending p{
+      margin: 0 0 14px;
+      font-weight: 900;
+      opacity:.9;
+    }
+    .ending img{
+  width: min(520px, 92vw);
+  height: 320px;              /* fixed box height */
+  object-fit: contain;          /* nice crop, no distortion */
+  object-position: center;
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,.08);
+  box-shadow: 0 16px 40px rgba(0,0,0,.12);
+  display:block;
+  background: #fff;
+  margin: 0 auto;
+}
+
+/* Optional: smaller on mobile */
+@media (max-width: 520px){
+  .ending img{ height: 240px; }
+}
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <div class="card">
+      <h1>Spin the Wheel 🎡</h1>
+      <div class="sub">Land on <b>Surprise Gift 🎁</b> to reveal the prize. Collect <b>3</b> surprise gifts to see surprise 💘</div>
+
+      <div class="stage">
+        <div class="wheelArea">
+          <div class="pin" aria-hidden="true"></div>
+          <canvas id="wheel" width="700" height="700"></canvas>
+        </div>
+
+        <div class="controls">
+          <button class="spinBtn" id="spinBtn">SPIN 🎡</button>
+          <button class="secondary" id="resetBtn">Restart ↺</button>
+        </div>
+
+        <div class="msg" id="msg"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="winsTitle">
+        <div class="pill" id="progressPill">Surprise Gifts: 0 / 3</div>
+        <div class="pill">Wins</div>
+      </div>
+      <div class="winsList" id="winsList"></div>
+    </div>
+  </div>
+
+  <!-- Surprise Modal -->
+  <div class="modalOverlay" id="surpriseOverlay">
+    <div class="modal">
+      <div class="modalHeader">
+        <h2>Surprise Gift 🎁</h2>
+        <button class="secondary" id="closeSurpriseBtn">Close</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="modalRow">
+          <div class="modalHint" id="surpriseHint">Click START PICKING 🎯 (one click only)</div>
+          <div class="pill" id="surpriseCountPill">Collected: 0 / 3</div>
+        </div>
+
+        <div id="boxesStage">
+          <div class="grid" id="boxGrid"></div>
+          <div class="modalActions">
+            <button class="spinBtn" id="startPickBtn">START PICKING 🎯</button>
+          </div>
+        </div>
+
+        <div class="revealStage" id="revealStage">
+          <div class="revealMedia">
+            <img id="revealImg" alt="Gift image" src="data:image/svg+xml;utf8,
+              <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
+                <defs>
+                  <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+                    <stop offset='0' stop-color='%23ff4d88'/>
+                    <stop offset='1' stop-color='%23ff87b2'/>
+                  </linearGradient>
+                </defs>
+                <rect width='100%25' height='100%25' fill='%23fff0f6'/>
+                <text x='600' y='270' font-family='system-ui,Segoe UI,Arial' font-size='64' font-weight='900' text-anchor='middle' fill='%23222'>
+                  Revealing…
+                </text>
+                <text x='600' y='350' font-family='system-ui,Segoe UI,Arial' font-size='34' font-weight='800' text-anchor='middle' fill='%23222' opacity='0.75'>
+                  (swap image later)
+                </text>
+              </svg>"/>
+            <div class="shimmer" id="shimmer"></div>
+          </div>
+
+          <div class="revealTitle" id="revealTitle">✨ Revealing…</div>
+          <p class="revealDesc" id="revealDesc">Hold on… 😌</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ending -->
+  <div class="endOverlay" id="endOverlay">
+    <div class="ending">
+      <h3>Happy Valentine’s Day 💖</h3>
+      <p>Your 3 gifts will deliver soon! 🎁✨ Now come claim your hugs 😌✨</p>
+      <img id="finalImg" alt="Happy Valentine" src="img/final.png"/>
+      <audio id="finalSong" preload="auto" loop>
+        <source src="audio/audio.mp3" type="audio/mpeg" />
+    </audio>
+      <!-- <img alt="Valentine heart" src="data:image/svg+xml;utf8,
+      <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
+        <defs>
+          <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+            <stop offset='0' stop-color='%23ff4d88'/>
+            <stop offset='1' stop-color='%23ff87b2'/>
+          </linearGradient>
+        </defs>
+        <rect width='100%25' height='100%25' fill='%23fff0f6'/>
+        <g transform='translate(600 360)'>
+          <path d='M0 220 C-260 60 -420 -80 -310 -210 C-220 -320 -80 -300 0 -200 C80 -300 220 -320 310 -210 C420 -80 260 60 0 220 Z'
+                fill='url(%23g)' stroke='%23111' stroke-opacity='0.08' stroke-width='12'/>
+        </g>
+        <text x='600' y='120' font-family='system-ui,Segoe UI,Arial' font-size='64' font-weight='900' text-anchor='middle' fill='%23222'>
+          You + Me = 💘
+        </text>
+      </svg>"/> -->
+    </div>
+  </div>
+
+<script>
+  const wheelCanvas = document.getElementById("wheel");
+  const ctx = wheelCanvas.getContext("2d");
+
+  const spinBtn = document.getElementById("spinBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const msg = document.getElementById("msg");
+
+  const winsList = document.getElementById("winsList");
+  const progressPill = document.getElementById("progressPill");
+
+  const surpriseOverlay = document.getElementById("surpriseOverlay");
+  const closeSurpriseBtn = document.getElementById("closeSurpriseBtn");
+
+  const surpriseHint = document.getElementById("surpriseHint");
+  const surpriseCountPill = document.getElementById("surpriseCountPill");
+
+  const boxesStage = document.getElementById("boxesStage");
+  const boxGrid = document.getElementById("boxGrid");
+  const startPickBtn = document.getElementById("startPickBtn");
+
+  const revealStage = document.getElementById("revealStage");
+  const revealImg = document.getElementById("revealImg");
+  const shimmer = document.getElementById("shimmer");
+  const revealTitle = document.getElementById("revealTitle");
+  const revealDesc = document.getElementById("revealDesc");
+
+  const endOverlay = document.getElementById("endOverlay");
+
+  const finalSong = document.getElementById("finalSong");
+  let audioUnlocked = false;
+
+  // ===== Placeholder image shown during the 3s reveal phase =====
+  const REVEAL_PLACEHOLDER =
+    "data:image/svg+xml;utf8," +
+    encodeURIComponent(`
+    <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
+      <defs>
+        <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+          <stop offset='0' stop-color='#ff4d88'/>
+          <stop offset='1' stop-color='#ff87b2'/>
+        </linearGradient>
+      </defs>
+      <rect width='100%' height='100%' fill='#fff0f6'/>
+      <text x='600' y='320' font-family='system-ui,Segoe UI,Arial' font-size='64' font-weight='900'
+            text-anchor='middle' fill='#222'>Revealing… ✨</text>
+      <text x='600' y='390' font-family='system-ui,Segoe UI,Arial' font-size='28' font-weight='800'
+            text-anchor='middle' fill='#222' opacity='0.75'>Please wait…</text>
+      <circle cx='600' cy='500' r='90' fill='url(#g)' opacity='0.9'/>
+    </svg>
+  `);
+
+  const segments = [
+    { type: "normal", label: "Flowers 🌸" },
+    { type: "surprise", label: "Surprise Gift 🎁" },
+    { type: "normal", label: "Relaxing Massage 💆‍♀️" },
+    { type: "surprise", label: "Surprise Gift 🎁" },
+    { type: "normal", label: "Shopping Date 🛍️" },
+    { type: "surprise", label: "Surprise Gift 🎁" },
+    { type: "normal", label: "Gourmet Chocolate 🍫" },
+    { type: "surprise", label: "Surprise Gift 🎁" },
+  ];
+
+  // Your 9 mystery gifts (index 0..8 matches the 9-box grid)
+  const surpriseGifts = [
+    { title: "Victoria Secret Bathrobe", desc: "", img: "img/vs.jpg" },
+    { title: "Warm Buddy", desc: "", img: "img/Teddy with heating.png" },
+    { title: "Adidas sneakers", desc: "", img: "img/adidas.png" },
+    { title: "Night Lamp", desc: "", img: "img/nightLamp.png" },
+    { title: "Instax", desc: "", img: "img/instax.png" },
+    { title: "Pure Cashmere Scarf", desc: "", img: "img/PureCashmereScarf.png" },
+    { title: "Perfume - Vanila Musk", desc: "", img: "img/perfume.png" },
+    { title: "Musical freeze magnet", desc: "", img: "img/magnet.png" },
+    { title: "Dyson Airwrap", desc: "", img: "img/dyson.png" }
+  ];
+
+  const TARGET_PICKS = 3;
+  const pickedSurprise = new Set();
+
+  const winsSet = new Set();
+  const wins = [];
+
+  const TAU = Math.PI * 2;
+  const segCount = segments.length;
+  const segAngle = TAU / segCount;
+
+  let angle = 0;
+  let spinning = false;
+  let spinStart = 0;
+  let spinDuration = 0;
+  let startAngle = 0;
+  let targetAngle = 0;
+
+  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+  function drawWheel(){
+    const w = wheelCanvas.width;
+    const h = wheelCanvas.height;
+    const cx = w/2, cy = h/2;
+    const radius = Math.min(w,h) * 0.44;
+
+    ctx.clearRect(0,0,w,h);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+
+    for(let i=0;i<segCount;i++){
+      const seg = segments[i];
+      const a0 = i * segAngle;
+      const a1 = a0 + segAngle;
+
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.arc(0,0, radius, a0, a1);
+      ctx.closePath();
+
+      ctx.fillStyle = seg.type === "surprise"
+        ? "rgba(255,77,136,0.20)"
+        : "rgba(0,0,0,0.04)";
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.save();
+      ctx.rotate(a0 + segAngle/2);
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(0,0,0,0.78)";
+      ctx.font = "900 26px system-ui, Segoe UI, Arial";
+      ctx.fillText(seg.label, radius - 18, 0);
+      ctx.restore();
+    }
+
+    ctx.beginPath();
+    ctx.arc(0,0, radius*0.18, 0, TAU);
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,0.10)";
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(0,0,0,0.78)";
+    ctx.font = "900 24px system-ui, Segoe UI, Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("SPIN", 0, 0);
+
+    ctx.restore();
+  }
+
+  function unlockAudioOnce(){
+  if (!finalSong || audioUnlocked) return;
+
+  // Start silently on first user gesture (SPIN / START PICKING etc.)
+  finalSong.muted = true;
+  finalSong.volume = 0;
+  finalSong.currentTime = 0;
+
+  const p = finalSong.play();
+  if (p && typeof p.then === "function"){
+    p.then(() => { audioUnlocked = true; }).catch(() => {});
+  } else {
+    audioUnlocked = true;
+  }
+}
+  function getLandedIndex(){
+    // pointer is at TOP (12 o'clock)
+    const pointerAngle = -Math.PI / 2;
+    let a = (pointerAngle - angle) % TAU;
+    if (a < 0) a += TAU;
+    return Math.floor(a / segAngle);
+  }
+
+  function setMessage(t){ msg.textContent = t; }
+
+  function renderWins(){
+    winsList.innerHTML = "";
+    for (const w of wins){
+      const row = document.createElement("div");
+      row.className = "winItem";
+      row.innerHTML = `<div>${w.label}</div><div class="winTag">${w.tagText}</div>`;
+      winsList.appendChild(row);
+    }
+  }
+
+  function addWin(label, tagText){
+    if (winsSet.has(label)) return;
+    winsSet.add(label);
+    wins.push({ label, tagText });
+    renderWins();
+  }
+
+  function updateProgress(){
+    progressPill.textContent = `Surprise Gifts: ${pickedSurprise.size} / ${TARGET_PICKS}`;
+  }
+
+  // ===== Surprise modal flow =====
+  let pickingInterval = null;
+  let lastFlash = -1;
+  let chosenIndex = null;
+  let busySurprise = false;
+
+  function renderBoxes(){
+    boxGrid.innerHTML = "";
+    for (let i=0;i<9;i++){
+      const div = document.createElement("div");
+      div.className = "box" + (pickedSurprise.has(i) ? " taken" : "");
+      div.dataset.idx = String(i);
+      boxGrid.appendChild(div);
+    }
+  }
+
+  function stopPicking(){
+    if (pickingInterval){
+      clearInterval(pickingInterval);
+      pickingInterval = null;
+    }
+    boxGrid.querySelectorAll(".box.flash").forEach(el => el.classList.remove("flash"));
+  }
+
+  function openSurpriseModal(){
+    if (pickedSurprise.size >= TARGET_PICKS) return;
+
+    busySurprise = false;
+    chosenIndex = null;
+    lastFlash = -1;
+    stopPicking();
+
+    // Ensure the reveal screen never shows an old gift image
+    revealImg.src = REVEAL_PLACEHOLDER;
+
+    boxesStage.style.display = "block";
+    revealStage.style.display = "none";
+
+    startPickBtn.classList.remove("disabled");
+    startPickBtn.disabled = false;
+
+    shimmer.style.display = "block";
+    revealTitle.textContent = "✨ Revealing…";
+    revealDesc.textContent = "Hold on… 😌";
+
+    surpriseHint.textContent = "Click START PICKING 🎯 (one click only)";
+    surpriseCountPill.textContent = `Collected: ${pickedSurprise.size} / ${TARGET_PICKS}`;
+
+    renderBoxes();
+    surpriseOverlay.style.display = "grid";
+  }
+
+  function closeSurpriseModal(){
+    if (busySurprise) return;
+    stopPicking();
+    surpriseOverlay.style.display = "none";
+  }
+
+  function startPickingFlow(){
+    unlockAudioOnce();
+    if (busySurprise) return;
+    if (pickedSurprise.size >= TARGET_PICKS) return;
+
+    busySurprise = true;
+    startPickBtn.classList.add("disabled");
+    startPickBtn.disabled = true;
+
+    surpriseHint.textContent = "Picking a box… 👀";
+
+    const available = [];
+    for (let i=0;i<9;i++){
+      if (!pickedSurprise.has(i)) available.push(i);
+    }
+    if (available.length === 0){
+      surpriseHint.textContent = "No boxes left 😅";
+      busySurprise = false;
+      return;
+    }
+
+    let ticks = 0;
+    const totalTicks = 26 + Math.floor(Math.random()*10);
+
+    function flash(idx){
+      if (lastFlash >= 0){
+        const prev = boxGrid.querySelector(`.box[data-idx="${lastFlash}"]`);
+        if (prev) prev.classList.remove("flash");
+      }
+      lastFlash = idx;
+      const el = boxGrid.querySelector(`.box[data-idx="${idx}"]`);
+      if (el) el.classList.add("flash");
+    }
+
+    pickingInterval = setInterval(() => {
+      ticks++;
+      flash(available[Math.floor(Math.random() * available.length)]);
+
+      if (ticks > totalTicks - 8){
+        clearInterval(pickingInterval);
+        pickingInterval = null;
+
+        let slowTicks = 0;
+        const slowTotal = 8;
+
+        const slowTimer = setInterval(() => {
+          slowTicks++;
+          const idx2 = available[Math.floor(Math.random() * available.length)];
+          flash(idx2);
+
+          if (slowTicks >= slowTotal){
+            clearInterval(slowTimer);
+            stopPicking();
+            chosenIndex = idx2;
+
+            const chosenEl = boxGrid.querySelector(`.box[data-idx="${chosenIndex}"]`);
+            if (chosenEl) chosenEl.classList.add("flash");
+
+            surpriseHint.textContent = "Locked ✅ Revealing prize…";
+            setTimeout(() => showRevealStage(), 350);
+          }
+        }, 170);
+      }
+    }, 70);
+  }
+
+  function showRevealStage(){
+    const all = boxGrid.querySelectorAll(".box");
+    all.forEach((b, i) => setTimeout(() => b.classList.add("fadeOut"), i * 18));
+
+    setTimeout(() => {
+      boxesStage.style.display = "none";
+      revealStage.style.display = "block";
+
+      const gift = surpriseGifts[chosenIndex];
+
+      // ALWAYS start reveal stage with placeholder (no gift shown)
+      revealImg.src = REVEAL_PLACEHOLDER;
+
+      // PHASE 1: 3 seconds "revealing" (no gift shown)
+      shimmer.style.display = "block";
+      revealTitle.textContent = "✨ Revealing…";
+      revealDesc.textContent = "Hold on… 😌";
+
+      setTimeout(() => {
+        // Now swap to the REAL gift image AFTER 3 seconds
+        if (gift?.img && gift.img.trim().length > 0){
+          revealImg.src = gift.img;
+        } else {
+          revealImg.src = REVEAL_PLACEHOLDER;
+        }
+
+        // PHASE 2: show gift for 4 seconds
+        revealTitle.textContent = `🎉 Your gift is ${gift.title}`;
+        revealDesc.textContent = gift.desc || "";
+        shimmer.style.display = "none";
+
+        setTimeout(() => {
+          // Add to list + count it AFTER she saw it for 4 seconds
+          pickedSurprise.add(chosenIndex);
+          updateProgress();
+          surpriseCountPill.textContent = `Collected: ${pickedSurprise.size} / ${TARGET_PICKS}`;
+          addWin(`Surprise: ${gift.title}`, "Surprise 🎁");
+
+          if (pickedSurprise.size >= TARGET_PICKS){
+            setTimeout(() => {
+              busySurprise = false;
+              closeSurpriseModal();
+              finishExperience();
+            }, 600);
+          } else {
+            setTimeout(() => {
+              busySurprise = false;
+              closeSurpriseModal();
+              setMessage("Spin again 😌");
+            }, 600);
+          }
+        }, 4000);
+
+      }, 3000);
+
+    }, 520);
+  }
+
+  function finishExperience(){
+  spinBtn.classList.add("disabled");
+  spinBtn.disabled = true;
+
+  setMessage("You collected 3 surprise gifts 💖");
+  endOverlay.style.display = "grid";
+
+  // Now turn audio ON automatically when ending appears
+  if (finalSong){
+    // If not yet unlocked, try anyway (some browsers will still block)
+    if (!audioUnlocked) unlockAudioOnce();
+
+    finalSong.muted = false;
+    finalSong.volume = 0.9;
+    finalSong.currentTime = 0;
+
+    finalSong.play().catch(() => {
+      // If a browser still blocks it, it will simply stay silent (no button required)
+      // Most cases: it will work because we unlocked on first spin.
+    });
+  }
+}
+
+
+  // ===== Wheel spin =====
+  function spin(){
+    unlockAudioOnce();
+    if (spinning) return;
+    if (pickedSurprise.size >= TARGET_PICKS) return;
+
+    setMessage("");
+    spinning = true;
+    spinStart = performance.now();
+    spinDuration = 2600 + Math.random() * 900;
+    startAngle = angle;
+
+    const extraRot = (4 + Math.random() * 3) * TAU;
+    const randomOffset = Math.random() * TAU;
+    targetAngle = startAngle + extraRot + randomOffset;
+
+    spinBtn.classList.add("disabled");
+    spinBtn.disabled = true;
+  }
+
+  function tick(now){
+    if (spinning){
+      const t = (now - spinStart) / spinDuration;
+      const tt = Math.min(1, Math.max(0, t));
+      const eased = easeOutCubic(tt);
+      angle = startAngle + (targetAngle - startAngle) * eased;
+
+      if (tt >= 1){
+        spinning = false;
+        angle = angle % TAU;
+        if (angle < 0) angle += TAU;
+
+        const idx = getLandedIndex();
+        const landed = segments[idx];
+
+        if (pickedSurprise.size >= TARGET_PICKS){
+          finishExperience();
+        } else if (landed.type === "surprise"){
+          setMessage("🎁 Surprise Gift! Opening…");
+          openSurpriseModal();
+        } else {
+          setMessage(`✅ You got: ${landed.label} — Spin again!`);
+          addWin(landed.label, "Wheel 🎡");
+        }
+
+        if (!spinning && pickedSurprise.size < TARGET_PICKS){
+          spinBtn.classList.remove("disabled");
+          spinBtn.disabled = false;
+        }
+      }
+    }
+
+    drawWheel();
+    requestAnimationFrame(tick);
+  }
+
+  function restart(){
+    spinning = false;
+    angle = 0;
+
+    pickedSurprise.clear();
+    winsSet.clear();
+    wins.length = 0;
+    renderWins();
+
+    endOverlay.style.display = "none";
+    surpriseOverlay.style.display = "none";
+
+    // Reset reveal to placeholder so it never flashes an old gift
+    revealImg.src = REVEAL_PLACEHOLDER;
+
+    spinBtn.disabled = false;
+    spinBtn.classList.remove("disabled");
+    resetBtn.disabled = false;
+    resetBtn.classList.remove("disabled");
+
+    updateProgress();
+    setMessage("Spin the wheel 🎡");
+    drawWheel();
+  }
+
+  spinBtn.addEventListener("click", spin);
+  resetBtn.addEventListener("click", restart);
+  closeSurpriseBtn.addEventListener("click", closeSurpriseModal);
+  startPickBtn.addEventListener("click", startPickingFlow);
+
+  surpriseOverlay.addEventListener("click", (e) => {
+    if (e.target === surpriseOverlay) closeSurpriseModal();
+  });
+
+  updateProgress();
+  setMessage("Spin the wheel 🎡");
+
+  // Initialize reveal image to placeholder
+  revealImg.src = REVEAL_PLACEHOLDER;
+
+  drawWheel();
+  requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>
