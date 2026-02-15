@@ -79,20 +79,17 @@
       background: rgba(255,255,255,.8);
     }
     .pin{
-  position:absolute;
-  top:-10px;             /* sits just outside the wheel */
-  left:50%;
-  transform: translateX(-50%);
-  width:0; height:0;
-
-  border-left:14px solid transparent;
-  border-right:14px solid transparent;
-  border-top:26px solid #111;     /* triangle points DOWN into the wheel */
-  border-bottom:0;
-
-  filter: drop-shadow(0 8px 10px rgba(0,0,0,.18));
-}
-
+      position:absolute;
+      top:-10px;
+      left:50%;
+      transform: translateX(-50%);
+      width:0; height:0;
+      border-left:14px solid transparent;
+      border-right:14px solid transparent;
+      border-top:26px solid #111; /* points DOWN into wheel */
+      border-bottom:0;
+      filter: drop-shadow(0 8px 10px rgba(0,0,0,.18));
+    }
 
     .controls{
       display:flex;
@@ -272,27 +269,26 @@
     }
 
     .revealMedia{
-  width:min(520px, 94vw);
-  height: 300px;                 /* fixed viewing window (change if you want) */
-  margin: 0 auto 12px;
-  border-radius: 18px;
-  border: 1px solid rgba(0,0,0,.10);
-  overflow:hidden;
-  box-shadow: 0 14px 34px rgba(0,0,0,.10);
-  background: #fafafa;
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.revealMedia img{
-  width:100%;
-  height:100%;
-  object-fit: contain;             /* fills the box nicely (no distortion) */
-  object-position: center;
-  display:block;
-}
+      width:min(520px, 94vw);
+      height: 300px;
+      margin: 0 auto 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.10);
+      overflow:hidden;
+      box-shadow: 0 14px 34px rgba(0,0,0,.10);
+      background: #fafafa;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .revealMedia img{
+      width:100%;
+      height:100%;
+      object-fit: contain;
+      object-position: center;
+      display:block;
+    }
 
     .shimmer{
       position:absolute;
@@ -334,13 +330,15 @@
       padding: 16px;
     }
     .ending{
-      width:min(720px, 96vw);
+      width:min(760px, 96vw);
       background: #fff;
       border-radius: 24px;
       box-shadow: var(--shadow);
       padding: 20px 18px;
       text-align:center;
       border: 1px solid rgba(0,0,0,.08);
+      max-height: 92vh;
+      overflow:auto;
     }
     .ending h3{
       margin: 6px 0 6px;
@@ -353,22 +351,67 @@
       opacity:.9;
     }
     .ending img{
-  width: min(520px, 92vw);
-  height: 320px;              /* fixed box height */
-  object-fit: contain;          /* nice crop, no distortion */
-  object-position: center;
-  border-radius: 18px;
-  border: 1px solid rgba(0,0,0,.08);
-  box-shadow: 0 16px 40px rgba(0,0,0,.12);
-  display:block;
-  background: #fff;
-  margin: 0 auto;
-}
+      width: min(520px, 92vw);
+      height: 320px;
+      object-fit: contain;
+      object-position: center;
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.08);
+      box-shadow: 0 16px 40px rgba(0,0,0,.12);
+      display:block;
+      background: #fff;
+      margin: 0 auto;
+    }
+    @media (max-width: 520px){
+      .ending img{ height: 240px; }
+    }
 
-/* Optional: smaller on mobile */
-@media (max-width: 520px){
-  .ending img{ height: 240px; }
-}
+    .finalBlock{
+      max-width:560px;
+      margin:14px auto 0;
+      text-align:left;
+    }
+    .finalTitle{
+      font-weight:1000;
+      font-size:18px;
+      margin-bottom:8px;
+    }
+    .finalList{
+      margin:0;
+      padding-left:22px;
+      font-weight:900;
+      opacity:.9;
+    }
+    .codeBox{
+      width:100%;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.15);
+      font-weight:900;
+      font-size:14px;
+      resize:vertical;
+      min-height:90px;
+    }
+    .btnRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin: 10px 0 8px;
+    }
+    .smallNote{
+      text-align:center;
+      margin: 8px 0 0;
+      font-weight:900;
+      opacity:.8;
+    }
+    .tiny{
+      opacity:.75;
+      font-size:13px;
+      font-weight:900;
+      text-align:center;
+      margin-top:8px;
+    }
   </style>
 </head>
 
@@ -386,7 +429,7 @@
 
         <div class="controls">
           <button class="spinBtn" id="spinBtn">SPIN 🎡</button>
-          <button class="secondary" id="resetBtn">Restart ↺</button>
+          <!-- Restart removed -->
         </div>
 
         <div class="msg" id="msg"></div>
@@ -427,18 +470,9 @@
           <div class="revealMedia">
             <img id="revealImg" alt="Gift image" src="data:image/svg+xml;utf8,
               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
-                <defs>
-                  <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
-                    <stop offset='0' stop-color='%23ff4d88'/>
-                    <stop offset='1' stop-color='%23ff87b2'/>
-                  </linearGradient>
-                </defs>
                 <rect width='100%25' height='100%25' fill='%23fff0f6'/>
-                <text x='600' y='270' font-family='system-ui,Segoe UI,Arial' font-size='64' font-weight='900' text-anchor='middle' fill='%23222'>
+                <text x='600' y='320' font-family='system-ui,Segoe UI,Arial' font-size='64' font-weight='900' text-anchor='middle' fill='%23222'>
                   Revealing…
-                </text>
-                <text x='600' y='350' font-family='system-ui,Segoe UI,Arial' font-size='34' font-weight='800' text-anchor='middle' fill='%23222' opacity='0.75'>
-                  (swap image later)
                 </text>
               </svg>"/>
             <div class="shimmer" id="shimmer"></div>
@@ -456,534 +490,903 @@
     <div class="ending">
       <h3>Happy Valentine’s Day 💖</h3>
       <p>Your 3 gifts will deliver soon! 🎁✨ Now come claim your hugs 😌✨</p>
+
+      <!-- Your final image -->
       <img id="finalImg" alt="Happy Valentine" src="img/final.png"/>
+
+      <!-- Your song -->
       <audio id="finalSong" preload="auto" loop>
         <source src="audio/audio.mp3" type="audio/mpeg" />
-    </audio>
-      <!-- <img alt="Valentine heart" src="data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
-        <defs>
-          <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
-            <stop offset='0' stop-color='%23ff4d88'/>
-            <stop offset='1' stop-color='%23ff87b2'/>
-          </linearGradient>
-        </defs>
-        <rect width='100%25' height='100%25' fill='%23fff0f6'/>
-        <g transform='translate(600 360)'>
-          <path d='M0 220 C-260 60 -420 -80 -310 -210 C-220 -320 -80 -300 0 -200 C80 -300 220 -320 310 -210 C420 -80 260 60 0 220 Z'
-                fill='url(%23g)' stroke='%23111' stroke-opacity='0.08' stroke-width='12'/>
-        </g>
-        <text x='600' y='120' font-family='system-ui,Segoe UI,Arial' font-size='64' font-weight='900' text-anchor='middle' fill='%23222'>
-          You + Me = 💘
-        </text>
-      </svg>"/> -->
+      </audio>
+
+      <!-- Show her the list (for her), but ONLY share the CODE -->
+      <div class="finalBlock">
+        <div class="finalTitle">You won 💝</div>
+        <ol class="finalList" id="finalWinsList"></ol>
+
+        <div class="finalTitle" style="margin-top:14px;">Result Code 🔐 (send This to your valentine)</div>
+        <textarea class="codeBox" id="resultCodeBox" readonly></textarea>
+
+        <div class="btnRow">
+          <button class="spinBtn" id="copyCodeBtn">Copy Result Code</button>
+        </div>
+
+        <p class="smallNote" id="copyStatus"></p>
+      </div>
     </div>
   </div>
 
-<script>
-  const wheelCanvas = document.getElementById("wheel");
-  const ctx = wheelCanvas.getContext("2d");
+  <script>
+    const wheelCanvas = document.getElementById("wheel");
+    const ctx = wheelCanvas.getContext("2d");
 
-  const spinBtn = document.getElementById("spinBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const msg = document.getElementById("msg");
+    const spinBtn = document.getElementById("spinBtn");
+    const msg = document.getElementById("msg");
 
-  const winsList = document.getElementById("winsList");
-  const progressPill = document.getElementById("progressPill");
+    const winsList = document.getElementById("winsList");
+    const progressPill = document.getElementById("progressPill");
 
-  const surpriseOverlay = document.getElementById("surpriseOverlay");
-  const closeSurpriseBtn = document.getElementById("closeSurpriseBtn");
+    const surpriseOverlay = document.getElementById("surpriseOverlay");
+    const closeSurpriseBtn = document.getElementById("closeSurpriseBtn");
 
-  const surpriseHint = document.getElementById("surpriseHint");
-  const surpriseCountPill = document.getElementById("surpriseCountPill");
+    const surpriseHint = document.getElementById("surpriseHint");
+    const surpriseCountPill = document.getElementById("surpriseCountPill");
 
-  const boxesStage = document.getElementById("boxesStage");
-  const boxGrid = document.getElementById("boxGrid");
-  const startPickBtn = document.getElementById("startPickBtn");
+    const boxesStage = document.getElementById("boxesStage");
+    const boxGrid = document.getElementById("boxGrid");
+    const startPickBtn = document.getElementById("startPickBtn");
 
-  const revealStage = document.getElementById("revealStage");
-  const revealImg = document.getElementById("revealImg");
-  const shimmer = document.getElementById("shimmer");
-  const revealTitle = document.getElementById("revealTitle");
-  const revealDesc = document.getElementById("revealDesc");
+    const revealStage = document.getElementById("revealStage");
+    const revealImg = document.getElementById("revealImg");
+    const shimmer = document.getElementById("shimmer");
+    const revealTitle = document.getElementById("revealTitle");
+    const revealDesc = document.getElementById("revealDesc");
 
-  const endOverlay = document.getElementById("endOverlay");
+    const endOverlay = document.getElementById("endOverlay");
 
-  const finalSong = document.getElementById("finalSong");
-  let audioUnlocked = false;
+    const finalSong = document.getElementById("finalSong");
+    let audioUnlocked = false;
 
-  // ===== Placeholder image shown during the 3s reveal phase =====
-  const REVEAL_PLACEHOLDER =
-    "data:image/svg+xml;utf8," +
-    encodeURIComponent(`
-    <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
-      <defs>
-        <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
-          <stop offset='0' stop-color='#ff4d88'/>
-          <stop offset='1' stop-color='#ff87b2'/>
-        </linearGradient>
-      </defs>
-      <rect width='100%' height='100%' fill='#fff0f6'/>
-      <text x='600' y='320' font-family='system-ui,Segoe UI,Arial' font-size='64' font-weight='900'
-            text-anchor='middle' fill='#222'>Revealing… ✨</text>
-      <text x='600' y='390' font-family='system-ui,Segoe UI,Arial' font-size='28' font-weight='800'
-            text-anchor='middle' fill='#222' opacity='0.75'>Please wait…</text>
-      <circle cx='600' cy='500' r='90' fill='url(#g)' opacity='0.9'/>
-    </svg>
-  `);
+    // Ending UI elements
+    const finalWinsList = document.getElementById("finalWinsList");
+    const resultCodeBox = document.getElementById("resultCodeBox");
+    const copyCodeBtn = document.getElementById("copyCodeBtn");
+    const copyStatus = document.getElementById("copyStatus");
 
-  const segments = [
-    { type: "normal", label: "Flowers 🌸" },
-    { type: "surprise", label: "Surprise Gift 🎁" },
-    { type: "normal", label: "Relaxing Massage 💆‍♀️" },
-    { type: "surprise", label: "Surprise Gift 🎁" },
-    { type: "normal", label: "Shopping Date 🛍️" },
-    { type: "surprise", label: "Surprise Gift 🎁" },
-    { type: "normal", label: "Gourmet Chocolate 🍫" },
-    { type: "surprise", label: "Surprise Gift 🎁" },
-  ];
+    // ===== Placeholder image shown during the 3s reveal phase =====
+    const REVEAL_PLACEHOLDER =
+      "data:image/svg+xml;utf8," +
+      encodeURIComponent(`
+        <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
+          <defs>
+            <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+              <stop offset='0' stop-color='#ff4d88'/>
+              <stop offset='1' stop-color='#ff87b2'/>
+            </linearGradient>
+          </defs>
+          <rect width='100%' height='100%' fill='#fff0f6'/>
+          <text x='600' y='320' font-family='system-ui,Segoe UI,Arial' font-size='64' font-weight='900'
+                text-anchor='middle' fill='#222'>Revealing… ✨</text>
+          <text x='600' y='390' font-family='system-ui,Segoe UI,Arial' font-size='28' font-weight='800'
+                text-anchor='middle' fill='#222' opacity='0.75'>Please wait…</text>
+          <circle cx='600' cy='500' r='90' fill='url(#g)' opacity='0.9'/>
+        </svg>
+      `);
 
-  // Your 9 mystery gifts (index 0..8 matches the 9-box grid)
-  const surpriseGifts = [
-    { title: "Victoria Secret Bathrobe", desc: "", img: "img/vs.jpg" },
-    { title: "Warm Buddy", desc: "", img: "img/Teddy with heating.png" },
-    { title: "Adidas sneakers", desc: "", img: "img/adidas.png" },
-    { title: "Night Lamp", desc: "", img: "img/nightLamp.png" },
-    { title: "Instax", desc: "", img: "img/instax.png" },
-    { title: "Pure Cashmere Scarf", desc: "", img: "img/PureCashmereScarf.png" },
-    { title: "Perfume - Vanila Musk", desc: "", img: "img/perfume.png" },
-    { title: "Musical freeze magnet", desc: "", img: "img/magnet.png" },
-    { title: "Dyson Airwrap", desc: "", img: "img/dyson.png" }
-  ];
+    const segments = [
+      { type: "normal", label: "Flowers 🌸" },
+      { type: "surprise", label: "Surprise Gift 🎁" },
+      { type: "normal", label: "Relaxing Massage 💆‍♀️" },
+      { type: "surprise", label: "Surprise Gift 🎁" },
+      { type: "normal", label: "Shopping Date 🛍️" },
+      { type: "surprise", label: "Surprise Gift 🎁" },
+      { type: "normal", label: "Gourmet Chocolate 🍫" },
+      { type: "surprise", label: "Surprise Gift 🎁" },
+    ];
 
-  const TARGET_PICKS = 3;
-  const pickedSurprise = new Set();
+    // Your 9 mystery gifts (index 0..8 matches the 9-box grid)
+    const surpriseGifts = [
+      { title: "Victoria Secret Bathrobe", desc: "", img: "img/vs.jpg" },
+      { title: "Warm Buddy", desc: "", img: "img/Teddy with heating.png" },
+      { title: "Adidas sneakers", desc: "", img: "img/adidas.png" },
+      { title: "Night Lamp", desc: "", img: "img/nightLamp.png" },
+      { title: "Instax", desc: "", img: "img/instax.png" },
+      { title: "Pure Cashmere Scarf", desc: "", img: "img/PureCashmereScarf.png" },
+      { title: "Perfume - Vanila Musk", desc: "", img: "img/perfume.png" },
+      { title: "Musical freeze magnet", desc: "", img: "img/magnet.png" },
+      { title: "Dyson Airwrap", desc: "", img: "img/dyson.png" }
+    ];
 
-  const winsSet = new Set();
-  const wins = [];
+    const TARGET_PICKS = 3;
+    const pickedSurprise = new Set();
 
-  const TAU = Math.PI * 2;
-  const segCount = segments.length;
-  const segAngle = TAU / segCount;
+    const winsSet = new Set();
+    const wins = [];
 
-  let angle = 0;
-  let spinning = false;
-  let spinStart = 0;
-  let spinDuration = 0;
-  let startAngle = 0;
-  let targetAngle = 0;
+    const TAU = Math.PI * 2;
+    const segCount = segments.length;
+    const segAngle = TAU / segCount;
 
-  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+    let angle = 0;
+    let spinning = false;
+    let spinStart = 0;
+    let spinDuration = 0;
+    let startAngle = 0;
+    let targetAngle = 0;
 
-  function drawWheel(){
-    const w = wheelCanvas.width;
-    const h = wheelCanvas.height;
-    const cx = w/2, cy = h/2;
-    const radius = Math.min(w,h) * 0.44;
+    function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
 
-    ctx.clearRect(0,0,w,h);
+    function drawWheel(){
+      const w = wheelCanvas.width;
+      const h = wheelCanvas.height;
+      const cx = w/2, cy = h/2;
+      const radius = Math.min(w,h) * 0.44;
 
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(angle);
-
-    for(let i=0;i<segCount;i++){
-      const seg = segments[i];
-      const a0 = i * segAngle;
-      const a1 = a0 + segAngle;
-
-      ctx.beginPath();
-      ctx.moveTo(0,0);
-      ctx.arc(0,0, radius, a0, a1);
-      ctx.closePath();
-
-      ctx.fillStyle = seg.type === "surprise"
-        ? "rgba(255,77,136,0.20)"
-        : "rgba(0,0,0,0.04)";
-      ctx.fill();
-
-      ctx.strokeStyle = "rgba(0,0,0,0.08)";
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      ctx.clearRect(0,0,w,h);
 
       ctx.save();
-      ctx.rotate(a0 + segAngle/2);
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      for(let i=0;i<segCount;i++){
+        const seg = segments[i];
+        const a0 = i * segAngle;
+        const a1 = a0 + segAngle;
+
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.arc(0,0, radius, a0, a1);
+        ctx.closePath();
+
+        ctx.fillStyle = seg.type === "surprise"
+          ? "rgba(255,77,136,0.20)"
+          : "rgba(0,0,0,0.04)";
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(0,0,0,0.08)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.rotate(a0 + segAngle/2);
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "rgba(0,0,0,0.78)";
+        ctx.font = "900 26px system-ui, Segoe UI, Arial";
+        ctx.fillText(seg.label, radius - 18, 0);
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(0,0, radius*0.18, 0, TAU);
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,0.10)";
+      ctx.lineWidth = 6;
+      ctx.stroke();
+
       ctx.fillStyle = "rgba(0,0,0,0.78)";
-      ctx.font = "900 26px system-ui, Segoe UI, Arial";
-      ctx.fillText(seg.label, radius - 18, 0);
+      ctx.font = "900 24px system-ui, Segoe UI, Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("SPIN", 0, 0);
+
       ctx.restore();
     }
 
-    ctx.beginPath();
-    ctx.arc(0,0, radius*0.18, 0, TAU);
-    ctx.fillStyle = "rgba(255,255,255,0.95)";
-    ctx.fill();
-    ctx.strokeStyle = "rgba(0,0,0,0.10)";
-    ctx.lineWidth = 6;
-    ctx.stroke();
+    function unlockAudioOnce(){
+      if (!finalSong || audioUnlocked) return;
 
-    ctx.fillStyle = "rgba(0,0,0,0.78)";
-    ctx.font = "900 24px system-ui, Segoe UI, Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("SPIN", 0, 0);
+      // Start silently on first user gesture, then we'll unmute at the ending
+      finalSong.muted = true;
+      finalSong.volume = 0;
+      finalSong.currentTime = 0;
 
-    ctx.restore();
-  }
-
-  function unlockAudioOnce(){
-  if (!finalSong || audioUnlocked) return;
-
-  // Start silently on first user gesture (SPIN / START PICKING etc.)
-  finalSong.muted = true;
-  finalSong.volume = 0;
-  finalSong.currentTime = 0;
-
-  const p = finalSong.play();
-  if (p && typeof p.then === "function"){
-    p.then(() => { audioUnlocked = true; }).catch(() => {});
-  } else {
-    audioUnlocked = true;
-  }
-}
-  function getLandedIndex(){
-    // pointer is at TOP (12 o'clock)
-    const pointerAngle = -Math.PI / 2;
-    let a = (pointerAngle - angle) % TAU;
-    if (a < 0) a += TAU;
-    return Math.floor(a / segAngle);
-  }
-
-  function setMessage(t){ msg.textContent = t; }
-
-  function renderWins(){
-    winsList.innerHTML = "";
-    for (const w of wins){
-      const row = document.createElement("div");
-      row.className = "winItem";
-      row.innerHTML = `<div>${w.label}</div><div class="winTag">${w.tagText}</div>`;
-      winsList.appendChild(row);
-    }
-  }
-
-  function addWin(label, tagText){
-    if (winsSet.has(label)) return;
-    winsSet.add(label);
-    wins.push({ label, tagText });
-    renderWins();
-  }
-
-  function updateProgress(){
-    progressPill.textContent = `Surprise Gifts: ${pickedSurprise.size} / ${TARGET_PICKS}`;
-  }
-
-  // ===== Surprise modal flow =====
-  let pickingInterval = null;
-  let lastFlash = -1;
-  let chosenIndex = null;
-  let busySurprise = false;
-
-  function renderBoxes(){
-    boxGrid.innerHTML = "";
-    for (let i=0;i<9;i++){
-      const div = document.createElement("div");
-      div.className = "box" + (pickedSurprise.has(i) ? " taken" : "");
-      div.dataset.idx = String(i);
-      boxGrid.appendChild(div);
-    }
-  }
-
-  function stopPicking(){
-    if (pickingInterval){
-      clearInterval(pickingInterval);
-      pickingInterval = null;
-    }
-    boxGrid.querySelectorAll(".box.flash").forEach(el => el.classList.remove("flash"));
-  }
-
-  function openSurpriseModal(){
-    if (pickedSurprise.size >= TARGET_PICKS) return;
-
-    busySurprise = false;
-    chosenIndex = null;
-    lastFlash = -1;
-    stopPicking();
-
-    // Ensure the reveal screen never shows an old gift image
-    revealImg.src = REVEAL_PLACEHOLDER;
-
-    boxesStage.style.display = "block";
-    revealStage.style.display = "none";
-
-    startPickBtn.classList.remove("disabled");
-    startPickBtn.disabled = false;
-
-    shimmer.style.display = "block";
-    revealTitle.textContent = "✨ Revealing…";
-    revealDesc.textContent = "Hold on… 😌";
-
-    surpriseHint.textContent = "Click START PICKING 🎯 (one click only)";
-    surpriseCountPill.textContent = `Collected: ${pickedSurprise.size} / ${TARGET_PICKS}`;
-
-    renderBoxes();
-    surpriseOverlay.style.display = "grid";
-  }
-
-  function closeSurpriseModal(){
-    if (busySurprise) return;
-    stopPicking();
-    surpriseOverlay.style.display = "none";
-  }
-
-  function startPickingFlow(){
-    unlockAudioOnce();
-    if (busySurprise) return;
-    if (pickedSurprise.size >= TARGET_PICKS) return;
-
-    busySurprise = true;
-    startPickBtn.classList.add("disabled");
-    startPickBtn.disabled = true;
-
-    surpriseHint.textContent = "Picking a box… 👀";
-
-    const available = [];
-    for (let i=0;i<9;i++){
-      if (!pickedSurprise.has(i)) available.push(i);
-    }
-    if (available.length === 0){
-      surpriseHint.textContent = "No boxes left 😅";
-      busySurprise = false;
-      return;
-    }
-
-    let ticks = 0;
-    const totalTicks = 26 + Math.floor(Math.random()*10);
-
-    function flash(idx){
-      if (lastFlash >= 0){
-        const prev = boxGrid.querySelector(`.box[data-idx="${lastFlash}"]`);
-        if (prev) prev.classList.remove("flash");
+      const p = finalSong.play();
+      if (p && typeof p.then === "function"){
+        p.then(() => { audioUnlocked = true; }).catch(() => {});
+      } else {
+        audioUnlocked = true;
       }
-      lastFlash = idx;
-      const el = boxGrid.querySelector(`.box[data-idx="${idx}"]`);
-      if (el) el.classList.add("flash");
     }
 
-    pickingInterval = setInterval(() => {
-      ticks++;
-      flash(available[Math.floor(Math.random() * available.length)]);
+    function getLandedIndex(){
+      const pointerAngle = -Math.PI / 2; // top pointer
+      let a = (pointerAngle - angle) % TAU;
+      if (a < 0) a += TAU;
+      return Math.floor(a / segAngle);
+    }
 
-      if (ticks > totalTicks - 8){
+    function setMessage(t){ msg.textContent = t; }
+
+    function renderWins(){
+      winsList.innerHTML = "";
+      for (const w of wins){
+        const row = document.createElement("div");
+        row.className = "winItem";
+        row.innerHTML = `<div>${w.label}</div><div class="winTag">${w.tagText}</div>`;
+        winsList.appendChild(row);
+      }
+    }
+
+    function addWin(label, tagText){
+      if (winsSet.has(label)) return;
+      winsSet.add(label);
+      wins.push({ label, tagText });
+      renderWins();
+    }
+
+    function updateProgress(){
+      progressPill.textContent = `Surprise Gifts: ${pickedSurprise.size} / ${TARGET_PICKS}`;
+    }
+
+    // ===== LZ-String (URL-safe compress/decompress) - frontend only =====
+    // --- LZ-String (URL-safe compress/decompress) - frontend only ---
+// Safe version (won't crash if included twice)
+var LZString = (function () {
+  function getBaseValue(alphabet, character) {
+    if (!baseReverseDic[alphabet]) {
+      baseReverseDic[alphabet] = {};
+      for (var i = 0; i < alphabet.length; i++) baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+    }
+    return baseReverseDic[alphabet][character];
+  }
+
+  var fromCharCode = String.fromCharCode;
+  var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+  var baseReverseDic = {};
+
+  var LZString = {
+    compressToEncodedURIComponent: function (input) {
+      if (input == null) return "";
+      return _compress(input, 6, function (a) { return keyStrUriSafe.charAt(a); });
+    },
+    decompressFromEncodedURIComponent: function (input) {
+      if (input == null) return "";
+      if (input === "") return null;
+      return _decompress(input.length, 32, function (index) {
+        return getBaseValue(keyStrUriSafe, input.charAt(index));
+      });
+    }
+  };
+
+  function _compress(uncompressed, bitsPerChar, getCharFromInt) {
+    if (uncompressed == null) return "";
+    var i, value;
+    var context_dictionary = {};
+    var context_dictionaryToCreate = {};
+    var context_c = "";
+    var context_wc = "";
+    var context_w = "";
+    var context_enlargeIn = 2;
+    var context_dictSize = 3;
+    var context_numBits = 2;
+    var context_data = [];
+    var context_data_val = 0;
+    var context_data_position = 0;
+
+    for (i = 0; i < uncompressed.length; i += 1) {
+      context_c = uncompressed.charAt(i);
+      if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
+        context_dictionary[context_c] = context_dictSize++;
+        context_dictionaryToCreate[context_c] = true;
+      }
+
+      context_wc = context_w + context_c;
+      if (Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)) {
+        context_w = context_wc;
+      } else {
+        if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+          if (context_w.charCodeAt(0) < 256) {
+            for (var j = 0; j < context_numBits; j++) {
+              context_data_val = (context_data_val << 1);
+              if (context_data_position === bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+            }
+            value = context_w.charCodeAt(0);
+            for (j = 0; j < 8; j++) {
+              context_data_val = (context_data_val << 1) | (value & 1);
+              if (context_data_position === bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          } else {
+            value = 1;
+            for (j = 0; j < context_numBits; j++) {
+              context_data_val = (context_data_val << 1) | value;
+              if (context_data_position === bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = 0;
+            }
+            value = context_w.charCodeAt(0);
+            for (j = 0; j < 16; j++) {
+              context_data_val = (context_data_val << 1) | (value & 1);
+              if (context_data_position === bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          }
+          context_enlargeIn--;
+          if (context_enlargeIn === 0) {
+            context_enlargeIn = Math.pow(2, context_numBits);
+            context_numBits++;
+          }
+          delete context_dictionaryToCreate[context_w];
+        } else {
+          value = context_dictionary[context_w];
+          for (j = 0; j < context_numBits; j++) {
+            context_data_val = (context_data_val << 1) | (value & 1);
+            if (context_data_position === bitsPerChar - 1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        }
+
+        context_enlargeIn--;
+        if (context_enlargeIn === 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+
+        context_dictionary[context_wc] = context_dictSize++;
+        context_w = String(context_c);
+      }
+    }
+
+    if (context_w !== "") {
+      if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+        if (context_w.charCodeAt(0) < 256) {
+          for (i = 0; i < context_numBits; i++) {
+            context_data_val = (context_data_val << 1);
+            if (context_data_position === bitsPerChar - 1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+          }
+          value = context_w.charCodeAt(0);
+          for (i = 0; i < 8; i++) {
+            context_data_val = (context_data_val << 1) | (value & 1);
+            if (context_data_position === bitsPerChar - 1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        } else {
+          value = 1;
+          for (i = 0; i < context_numBits; i++) {
+            context_data_val = (context_data_val << 1) | value;
+            if (context_data_position === bitsPerChar - 1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = 0;
+          }
+          value = context_w.charCodeAt(0);
+          for (i = 0; i < 16; i++) {
+            context_data_val = (context_data_val << 1) | (value & 1);
+            if (context_data_position === bitsPerChar - 1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn === 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+        delete context_dictionaryToCreate[context_w];
+      } else {
+        value = context_dictionary[context_w];
+        for (i = 0; i < context_numBits; i++) {
+          context_data_val = (context_data_val << 1) | (value & 1);
+          if (context_data_position === bitsPerChar - 1) {
+            context_data_position = 0;
+            context_data.push(getCharFromInt(context_data_val));
+            context_data_val = 0;
+          } else {
+            context_data_position++;
+          }
+          value = value >> 1;
+        }
+      }
+      context_enlargeIn--;
+      if (context_enlargeIn === 0) {
+        context_enlargeIn = Math.pow(2, context_numBits);
+        context_numBits++;
+      }
+    }
+
+    value = 2;
+    for (i = 0; i < context_numBits; i++) {
+      context_data_val = (context_data_val << 1) | (value & 1);
+      if (context_data_position === bitsPerChar - 1) {
+        context_data_position = 0;
+        context_data.push(getCharFromInt(context_data_val));
+        context_data_val = 0;
+      } else {
+        context_data_position++;
+      }
+      value = value >> 1;
+    }
+
+    while (true) {
+      context_data_val = (context_data_val << 1);
+      if (context_data_position === bitsPerChar - 1) {
+        context_data.push(getCharFromInt(context_data_val));
+        break;
+      } else context_data_position++;
+    }
+
+    return context_data.join("");
+  }
+
+  function _decompress(length, resetValue, getNextValue) {
+    var dictionary = [];
+    var next;
+    var enlargeIn = 4;
+    var dictSize = 4;
+    var numBits = 3;
+    var entry = "";
+    var result = [];
+    var i;
+    var w;
+    var bits, resb, maxpower, power;
+    var c;
+    var data = { val: getNextValue(0), position: resetValue, index: 1 };
+
+    for (i = 0; i < 3; i += 1) dictionary[i] = i;
+
+    bits = 0; maxpower = Math.pow(2, 2); power = 1;
+    while (power !== maxpower) {
+      resb = data.val & data.position;
+      data.position >>= 1;
+      if (data.position === 0) { data.position = resetValue; data.val = getNextValue(data.index++); }
+      bits |= (resb > 0 ? 1 : 0) * power;
+      power <<= 1;
+    }
+
+    switch (next = bits) {
+      case 0:
+        bits = 0; maxpower = Math.pow(2, 8); power = 1;
+        while (power !== maxpower) {
+          resb = data.val & data.position;
+          data.position >>= 1;
+          if (data.position === 0) { data.position = resetValue; data.val = getNextValue(data.index++); }
+          bits |= (resb > 0 ? 1 : 0) * power;
+          power <<= 1;
+        }
+        c = fromCharCode(bits);
+        break;
+      case 1:
+        bits = 0; maxpower = Math.pow(2, 16); power = 1;
+        while (power !== maxpower) {
+          resb = data.val & data.position;
+          data.position >>= 1;
+          if (data.position === 0) { data.position = resetValue; data.val = getNextValue(data.index++); }
+          bits |= (resb > 0 ? 1 : 0) * power;
+          power <<= 1;
+        }
+        c = fromCharCode(bits);
+        break;
+      case 2: return "";
+    }
+
+    dictionary[3] = c;
+    w = c;
+    result.push(c);
+
+    while (true) {
+      if (data.index > length) return "";
+
+      bits = 0; maxpower = Math.pow(2, numBits); power = 1;
+      while (power !== maxpower) {
+        resb = data.val & data.position;
+        data.position >>= 1;
+        if (data.position === 0) { data.position = resetValue; data.val = getNextValue(data.index++); }
+        bits |= (resb > 0 ? 1 : 0) * power;
+        power <<= 1;
+      }
+
+      switch (c = bits) {
+        case 0:
+          bits = 0; maxpower = Math.pow(2, 8); power = 1;
+          while (power !== maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position === 0) { data.position = resetValue; data.val = getNextValue(data.index++); }
+            bits |= (resb > 0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+          dictionary[dictSize++] = fromCharCode(bits);
+          c = dictSize - 1;
+          enlargeIn--;
+          break;
+        case 1:
+          bits = 0; maxpower = Math.pow(2, 16); power = 1;
+          while (power !== maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position === 0) { data.position = resetValue; data.val = getNextValue(data.index++); }
+            bits |= (resb > 0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+          dictionary[dictSize++] = fromCharCode(bits);
+          c = dictSize - 1;
+          enlargeIn--;
+          break;
+        case 2:
+          return result.join("");
+      }
+
+      if (enlargeIn === 0) { enlargeIn = Math.pow(2, numBits); numBits++; }
+
+      if (dictionary[c]) entry = dictionary[c];
+      else if (c === dictSize) entry = w + w.charAt(0);
+      else return null;
+
+      result.push(entry);
+
+      dictionary[dictSize++] = w + entry.charAt(0);
+      enlargeIn--;
+      w = entry;
+
+      if (enlargeIn === 0) { enlargeIn = Math.pow(2, numBits); numBits++; }
+    }
+  }
+
+  return LZString;
+})();
+
+    function getWonLabelsInOrder(){
+      return wins.map(w => w.label);
+    }
+
+    function makeResultCode(){
+      const payload = {
+        v: 1,
+        t: Date.now(),
+        items: getWonLabelsInOrder()
+      };
+      const json = JSON.stringify(payload);
+      const packed = LZString.compressToEncodedURIComponent(json);
+      return `VD1.${packed}`;
+    }
+
+    // ===== Surprise modal flow =====
+    let pickingInterval = null;
+    let lastFlash = -1;
+    let chosenIndex = null;
+    let busySurprise = false;
+
+    function renderBoxes(){
+      boxGrid.innerHTML = "";
+      for (let i=0;i<9;i++){
+        const div = document.createElement("div");
+        div.className = "box" + (pickedSurprise.has(i) ? " taken" : "");
+        div.dataset.idx = String(i);
+        boxGrid.appendChild(div);
+      }
+    }
+
+    function stopPicking(){
+      if (pickingInterval){
         clearInterval(pickingInterval);
         pickingInterval = null;
-
-        let slowTicks = 0;
-        const slowTotal = 8;
-
-        const slowTimer = setInterval(() => {
-          slowTicks++;
-          const idx2 = available[Math.floor(Math.random() * available.length)];
-          flash(idx2);
-
-          if (slowTicks >= slowTotal){
-            clearInterval(slowTimer);
-            stopPicking();
-            chosenIndex = idx2;
-
-            const chosenEl = boxGrid.querySelector(`.box[data-idx="${chosenIndex}"]`);
-            if (chosenEl) chosenEl.classList.add("flash");
-
-            surpriseHint.textContent = "Locked ✅ Revealing prize…";
-            setTimeout(() => showRevealStage(), 350);
-          }
-        }, 170);
       }
-    }, 70);
-  }
+      boxGrid.querySelectorAll(".box.flash").forEach(el => el.classList.remove("flash"));
+    }
 
-  function showRevealStage(){
-    const all = boxGrid.querySelectorAll(".box");
-    all.forEach((b, i) => setTimeout(() => b.classList.add("fadeOut"), i * 18));
+    function openSurpriseModal(){
+      if (pickedSurprise.size >= TARGET_PICKS) return;
 
-    setTimeout(() => {
-      boxesStage.style.display = "none";
-      revealStage.style.display = "block";
+      busySurprise = false;
+      chosenIndex = null;
+      lastFlash = -1;
+      stopPicking();
 
-      const gift = surpriseGifts[chosenIndex];
-
-      // ALWAYS start reveal stage with placeholder (no gift shown)
       revealImg.src = REVEAL_PLACEHOLDER;
 
-      // PHASE 1: 3 seconds "revealing" (no gift shown)
+      boxesStage.style.display = "block";
+      revealStage.style.display = "none";
+
+      startPickBtn.classList.remove("disabled");
+      startPickBtn.disabled = false;
+
       shimmer.style.display = "block";
       revealTitle.textContent = "✨ Revealing…";
       revealDesc.textContent = "Hold on… 😌";
 
-      setTimeout(() => {
-        // Now swap to the REAL gift image AFTER 3 seconds
-        if (gift?.img && gift.img.trim().length > 0){
-          revealImg.src = gift.img;
-        } else {
-          revealImg.src = REVEAL_PLACEHOLDER;
-        }
+      surpriseHint.textContent = "Click START PICKING 🎯 (one click only)";
+      surpriseCountPill.textContent = `Collected: ${pickedSurprise.size} / ${TARGET_PICKS}`;
 
-        // PHASE 2: show gift for 4 seconds
-        revealTitle.textContent = `🎉 Your gift is ${gift.title}`;
-        revealDesc.textContent = gift.desc || "";
-        shimmer.style.display = "none";
+      renderBoxes();
+      surpriseOverlay.style.display = "grid";
+    }
+
+    function closeSurpriseModal(){
+      if (busySurprise) return;
+      stopPicking();
+      surpriseOverlay.style.display = "none";
+    }
+
+    function startPickingFlow(){
+      unlockAudioOnce();
+      if (busySurprise) return;
+      if (pickedSurprise.size >= TARGET_PICKS) return;
+
+      busySurprise = true;
+      startPickBtn.classList.add("disabled");
+      startPickBtn.disabled = true;
+
+      surpriseHint.textContent = "Picking a box… 👀";
+
+      const available = [];
+      for (let i=0;i<9;i++){
+        if (!pickedSurprise.has(i)) available.push(i);
+      }
+      if (available.length === 0){
+        surpriseHint.textContent = "No boxes left 😅";
+        busySurprise = false;
+        return;
+      }
+
+      let ticks = 0;
+      const totalTicks = 26 + Math.floor(Math.random()*10);
+
+      function flash(idx){
+        if (lastFlash >= 0){
+          const prev = boxGrid.querySelector(`.box[data-idx="${lastFlash}"]`);
+          if (prev) prev.classList.remove("flash");
+        }
+        lastFlash = idx;
+        const el = boxGrid.querySelector(`.box[data-idx="${idx}"]`);
+        if (el) el.classList.add("flash");
+      }
+
+      pickingInterval = setInterval(() => {
+        ticks++;
+        flash(available[Math.floor(Math.random() * available.length)]);
+
+        if (ticks > totalTicks - 8){
+          clearInterval(pickingInterval);
+          pickingInterval = null;
+
+          let slowTicks = 0;
+          const slowTotal = 8;
+
+          const slowTimer = setInterval(() => {
+            slowTicks++;
+            const idx2 = available[Math.floor(Math.random() * available.length)];
+            flash(idx2);
+
+            if (slowTicks >= slowTotal){
+              clearInterval(slowTimer);
+              stopPicking();
+              chosenIndex = idx2;
+
+              const chosenEl = boxGrid.querySelector(`.box[data-idx="${chosenIndex}"]`);
+              if (chosenEl) chosenEl.classList.add("flash");
+
+              surpriseHint.textContent = "Locked ✅ Revealing prize…";
+              setTimeout(() => showRevealStage(), 350);
+            }
+          }, 170);
+        }
+      }, 70);
+    }
+
+    function showRevealStage(){
+      const all = boxGrid.querySelectorAll(".box");
+      all.forEach((b, i) => setTimeout(() => b.classList.add("fadeOut"), i * 18));
+
+      setTimeout(() => {
+        boxesStage.style.display = "none";
+        revealStage.style.display = "block";
+
+        const gift = surpriseGifts[chosenIndex];
+
+        revealImg.src = REVEAL_PLACEHOLDER;
+
+        // PHASE 1: 3 seconds "revealing"
+        shimmer.style.display = "block";
+        revealTitle.textContent = "✨ Revealing…";
+        revealDesc.textContent = "Hold on… 😌";
 
         setTimeout(() => {
-          // Add to list + count it AFTER she saw it for 4 seconds
-          pickedSurprise.add(chosenIndex);
-          updateProgress();
-          surpriseCountPill.textContent = `Collected: ${pickedSurprise.size} / ${TARGET_PICKS}`;
-          addWin(`Surprise: ${gift.title}`, "Surprise 🎁");
-
-          if (pickedSurprise.size >= TARGET_PICKS){
-            setTimeout(() => {
-              busySurprise = false;
-              closeSurpriseModal();
-              finishExperience();
-            }, 600);
+          // swap to real image AFTER 3 seconds
+          if (gift?.img && gift.img.trim().length > 0){
+            revealImg.src = gift.img;
           } else {
-            setTimeout(() => {
-              busySurprise = false;
-              closeSurpriseModal();
-              setMessage("Spin again 😌");
-            }, 600);
+            revealImg.src = REVEAL_PLACEHOLDER;
           }
-        }, 4000);
 
-      }, 3000);
+          // PHASE 2: show gift for 4 seconds
+          revealTitle.textContent = `🎉 Your gift is ${gift.title}`;
+          revealDesc.textContent = gift.desc || "";
+          shimmer.style.display = "none";
 
-    }, 520);
-  }
+          setTimeout(() => {
+            pickedSurprise.add(chosenIndex);
+            updateProgress();
+            surpriseCountPill.textContent = `Collected: ${pickedSurprise.size} / ${TARGET_PICKS}`;
+            addWin(`Surprise: ${gift.title}`, "Surprise 🎁");
 
-  function finishExperience(){
-  spinBtn.classList.add("disabled");
-  spinBtn.disabled = true;
+            if (pickedSurprise.size >= TARGET_PICKS){
+              setTimeout(() => {
+                busySurprise = false;
+                closeSurpriseModal();
+                finishExperience();
+              }, 600);
+            } else {
+              setTimeout(() => {
+                busySurprise = false;
+                closeSurpriseModal();
+                setMessage("Spin again 😌");
+              }, 600);
+            }
+          }, 4000);
 
-  setMessage("You collected 3 surprise gifts 💖");
-  endOverlay.style.display = "grid";
+        }, 3000);
 
-  // Now turn audio ON automatically when ending appears
-  if (finalSong){
-    // If not yet unlocked, try anyway (some browsers will still block)
-    if (!audioUnlocked) unlockAudioOnce();
+      }, 520);
+    }
 
-    finalSong.muted = false;
-    finalSong.volume = 0.9;
-    finalSong.currentTime = 0;
-
-    finalSong.play().catch(() => {
-      // If a browser still blocks it, it will simply stay silent (no button required)
-      // Most cases: it will work because we unlocked on first spin.
-    });
-  }
-}
-
-
-  // ===== Wheel spin =====
-  function spin(){
-    unlockAudioOnce();
-    if (spinning) return;
-    if (pickedSurprise.size >= TARGET_PICKS) return;
-
-    setMessage("");
-    spinning = true;
-    spinStart = performance.now();
-    spinDuration = 2600 + Math.random() * 900;
-    startAngle = angle;
-
-    const extraRot = (4 + Math.random() * 3) * TAU;
-    const randomOffset = Math.random() * TAU;
-    targetAngle = startAngle + extraRot + randomOffset;
-
-    spinBtn.classList.add("disabled");
-    spinBtn.disabled = true;
-  }
-
-  function tick(now){
-    if (spinning){
-      const t = (now - spinStart) / spinDuration;
-      const tt = Math.min(1, Math.max(0, t));
-      const eased = easeOutCubic(tt);
-      angle = startAngle + (targetAngle - startAngle) * eased;
-
-      if (tt >= 1){
-        spinning = false;
-        angle = angle % TAU;
-        if (angle < 0) angle += TAU;
-
-        const idx = getLandedIndex();
-        const landed = segments[idx];
-
-        if (pickedSurprise.size >= TARGET_PICKS){
-          finishExperience();
-        } else if (landed.type === "surprise"){
-          setMessage("🎁 Surprise Gift! Opening…");
-          openSurpriseModal();
-        } else {
-          setMessage(`✅ You got: ${landed.label} — Spin again!`);
-          addWin(landed.label, "Wheel 🎡");
-        }
-
-        if (!spinning && pickedSurprise.size < TARGET_PICKS){
-          spinBtn.classList.remove("disabled");
-          spinBtn.disabled = false;
-        }
+    function renderFinalWins(){
+      if (!finalWinsList) return;
+      finalWinsList.innerHTML = "";
+      for (const label of getWonLabelsInOrder()){
+        const li = document.createElement("li");
+        li.textContent = label;
+        finalWinsList.appendChild(li);
       }
     }
 
-    drawWheel();
-    requestAnimationFrame(tick);
-  }
+    function finishExperience(){
+      spinBtn.classList.add("disabled");
+      spinBtn.disabled = true;
 
-  function restart(){
-    spinning = false;
-    angle = 0;
+      setMessage("You collected 3 surprise gifts 💖");
+      endOverlay.style.display = "grid";
 
-    pickedSurprise.clear();
-    winsSet.clear();
-    wins.length = 0;
-    renderWins();
+      // Show list (for her)
+      renderFinalWins();
 
-    endOverlay.style.display = "none";
-    surpriseOverlay.style.display = "none";
+      // Generate ONE reversible code (send only this)
+      const code = makeResultCode();
+      if (resultCodeBox) resultCodeBox.value = code;
 
-    // Reset reveal to placeholder so it never flashes an old gift
-    revealImg.src = REVEAL_PLACEHOLDER;
+      // Copy code button
+      if (copyCodeBtn){
+        copyCodeBtn.onclick = async () => {
+          try{
+            await navigator.clipboard.writeText(code);
+            if (copyStatus) copyStatus.textContent = "Copied! Send me only this code 🔐💌";
+          }catch{
+            if (copyStatus) copyStatus.textContent = "Copy blocked — select the code and copy manually.";
+          }
+        };
+      }
 
-    spinBtn.disabled = false;
-    spinBtn.classList.remove("disabled");
-    resetBtn.disabled = false;
-    resetBtn.classList.remove("disabled");
+      // Turn audio ON when ending appears
+      if (finalSong){
+        if (!audioUnlocked) unlockAudioOnce();
+        finalSong.muted = false;
+        finalSong.volume = 0.9;
+        finalSong.currentTime = 0;
+        finalSong.play().catch(() => {});
+      }
+    }
+
+    // ===== Wheel spin =====
+    function spin(){
+      unlockAudioOnce();
+      if (spinning) return;
+      if (pickedSurprise.size >= TARGET_PICKS) return;
+
+      setMessage("");
+      spinning = true;
+      spinStart = performance.now();
+      spinDuration = 2600 + Math.random() * 900;
+      startAngle = angle;
+
+      const extraRot = (4 + Math.random() * 3) * TAU;
+      const randomOffset = Math.random() * TAU;
+      targetAngle = startAngle + extraRot + randomOffset;
+
+      spinBtn.classList.add("disabled");
+      spinBtn.disabled = true;
+    }
+
+    function tick(now){
+      if (spinning){
+        const t = (now - spinStart) / spinDuration;
+        const tt = Math.min(1, Math.max(0, t));
+        const eased = easeOutCubic(tt);
+        angle = startAngle + (targetAngle - startAngle) * eased;
+
+        if (tt >= 1){
+          spinning = false;
+          angle = angle % TAU;
+          if (angle < 0) angle += TAU;
+
+          const idx = getLandedIndex();
+          const landed = segments[idx];
+
+          if (pickedSurprise.size >= TARGET_PICKS){
+            finishExperience();
+          } else if (landed.type === "surprise"){
+            setMessage("🎁 Surprise Gift! Opening…");
+            openSurpriseModal();
+          } else {
+            setMessage(`✅ You got: ${landed.label} — Spin again!`);
+            addWin(landed.label, "Wheel 🎡");
+          }
+
+          if (!spinning && pickedSurprise.size < TARGET_PICKS){
+            spinBtn.classList.remove("disabled");
+            spinBtn.disabled = false;
+          }
+        }
+      }
+
+      drawWheel();
+      requestAnimationFrame(tick);
+    }
+
+    spinBtn.addEventListener("click", spin);
+    closeSurpriseBtn.addEventListener("click", closeSurpriseModal);
+    startPickBtn.addEventListener("click", startPickingFlow);
+
+    surpriseOverlay.addEventListener("click", (e) => {
+      if (e.target === surpriseOverlay) closeSurpriseModal();
+    });
 
     updateProgress();
     setMessage("Spin the wheel 🎡");
+    revealImg.src = REVEAL_PLACEHOLDER;
+
     drawWheel();
-  }
-
-  spinBtn.addEventListener("click", spin);
-  resetBtn.addEventListener("click", restart);
-  closeSurpriseBtn.addEventListener("click", closeSurpriseModal);
-  startPickBtn.addEventListener("click", startPickingFlow);
-
-  surpriseOverlay.addEventListener("click", (e) => {
-    if (e.target === surpriseOverlay) closeSurpriseModal();
-  });
-
-  updateProgress();
-  setMessage("Spin the wheel 🎡");
-
-  // Initialize reveal image to placeholder
-  revealImg.src = REVEAL_PLACEHOLDER;
-
-  drawWheel();
-  requestAnimationFrame(tick);
-</script>
-
+    requestAnimationFrame(tick);
+  </script>
 </body>
 </html>
