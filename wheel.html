@@ -501,7 +501,7 @@
 
       <!-- Show her the list (for her), but ONLY share the CODE -->
       <div class="finalBlock">
-        <div class="finalTitle">Your Precious Gifts 💝</div>
+        <div class="finalTitle">Your precious gifts 💝</div>
         <ol class="finalList" id="finalWinsList"></ol>
 
         <div class="finalTitle" style="margin-top:14px;">Result Code 🔐 (send This to your valentine)</div>
@@ -591,7 +591,7 @@
       { title: "Adidas sneakers", desc: "", img: "img/adidas.png" },
       { title: "Night Lamp", desc: "", img: "img/nightLamp.png" },
       { title: "Instax", desc: "", img: "img/instax.png" },
-      { title: "Pure Cashmere Scarf", desc: "", img: "img/PureCashmereScarf.png" },
+      { title: "Pure Cashmere Scarf", desc: "", img: "img/pureCashmereScarf.png" },
       { title: "Perfume - Vanila Musk", desc: "", img: "img/perfume.png" },
       { title: "Musical freeze magnet", desc: "", img: "img/magnet.png" },
       { title: "Dyson Airwrap", desc: "", img: "img/dyson.png" }
@@ -1300,7 +1300,7 @@ var LZString = (function () {
         copyCodeBtn.onclick = async () => {
           try{
             await navigator.clipboard.writeText(code);
-            if (copyStatus) copyStatus.textContent = "Copied! Send it yours truly !! 🔐💌";
+            if (copyStatus) copyStatus.textContent = "Copied! Send this to yours truly 🔐💌";
           }catch{
             if (copyStatus) copyStatus.textContent = "Copy blocked — select the code and copy manually.";
           }
@@ -1390,4 +1390,3 @@ var LZString = (function () {
   </script>
 </body>
 </html>
-
